@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.errors.InterruptException;
 
 /**
  * @since 0.0.1
@@ -25,6 +26,9 @@ public class AsynchronousDeliveryStrategy implements DeliveryStrategy {
             });
             return true;
         } catch (BufferExhaustedException e) {
+            failedDeliveryCallback.onFailedDelivery(event, e);
+            return false;
+        } catch (InterruptException e){
             failedDeliveryCallback.onFailedDelivery(event, e);
             return false;
         }
